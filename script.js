@@ -1,25 +1,20 @@
-async function checkSpam(){
-    const addressInput = document.getElementById('address-Input').value;
-    const resultElement = document.getElementById('result');
-
-    try {
-        // model load
-        const model  = await tf.loadLayerModel('');
-
-        //주소 전처리
-        const addressTensor = tf.tensor([addressInput]);
-
-        //spam check
-        const prediction = await model.predict(addressTensor);
-        const isSpam = prediction.dataSync()[0] > 0.5;
-
-        //result
-        resultElement.textContent = isSpam
-        ? 'The address is considered spam'
-        : 'The address is not considered spam';
-    }
-    catch (error){
-        console.error('Error', error);
-        resultElement.textContent = 'Error!! please checking address'
-    }
-}
+$(document).ready(function() {
+    $('#check-button').on('click', function() {
+      const email = $('#address-input').val();
+  
+      $.ajax({
+        url: '/predict',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ message: email }),
+        success: function(response) {
+          const spamStatus = response.spam ? '스팸 메일입니다.' : '정상 메일입니다.';
+          $('#result').text(spamStatus);
+        },
+        error: function() {
+          $('#result').text('오류가 발생했습니다.');
+        }
+      });
+    });
+  });
+  
